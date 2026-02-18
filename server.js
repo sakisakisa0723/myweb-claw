@@ -129,59 +129,68 @@ function getHtmlPage() {
   <style>
     /* ── CSS 变量（主题） ── */
     :root {
-      --bg: #ffffff;
-      --bg2: #f5f5f5;
-      --bg3: #ebebeb;
+      --bg: #EDEDED;
+      --bg2: #f7f7f7;
+      --bg3: #e0e0e0;
+      --chat-bg: #EDEDED;
+      --sidebar-bg: #f5f5f5;
+      --topbar-bg: #EDEDED;
       --border: #d9d9d9;
       --text: #1a1a1a;
       --text2: #555555;
       --text3: #888888;
-      --user-bubble: #1d72e8;
-      --user-text: #ffffff;
-      --assistant-bg: #f0f4ff;
-      --tool-bg: #f7f7f7;
+      --user-bubble: #95EC69;
+      --user-text: #1a1a1a;
+      --assistant-bg: #ffffff;
+      --tool-bg: #f2f2f2;
       --tool-border: #d0d0d0;
-      --thinking-bg: #fdfaf0;
-      --thinking-border: #e8d87a;
-      --accent: #1d72e8;
+      --thinking-bg: #f5f0e8;
+      --thinking-border: #d4b896;
+      --accent: #07C160;
+      --accent-hover: #06ad56;
       --danger: #e84040;
-      --sidebar-w: 260px;
-      --radius: 12px;
+      --sidebar-w: 280px;
+      --radius: 8px;
+      --avatar-size: 40px;
     }
     [data-theme="dark"] {
-      --bg: #1a1a1a;
-      --bg2: #242424;
-      --bg3: #2e2e2e;
+      --bg: #1E1E1E;
+      --bg2: #2a2a2a;
+      --bg3: #333333;
+      --chat-bg: #1E1E1E;
+      --sidebar-bg: #252525;
+      --topbar-bg: #252525;
       --border: #3a3a3a;
       --text: #e8e8e8;
       --text2: #aaaaaa;
       --text3: #666666;
-      --user-bubble: #2b5fd4;
+      --user-bubble: #3d9a40;
       --user-text: #ffffff;
-      --assistant-bg: #1e2330;
+      --assistant-bg: #2d2d2d;
       --tool-bg: #252525;
       --tool-border: #3a3a3a;
-      --thinking-bg: #23200f;
-      --thinking-border: #6b5c10;
-      --accent: #4d8bff;
+      --thinking-bg: #2a2618;
+      --thinking-border: #5a4a20;
+      --accent: #07C160;
+      --accent-hover: #06ad56;
     }
 
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
       background: var(--bg);
       color: var(--text);
       display: flex;
       transition: background 0.2s, color 0.2s;
     }
 
-    /* ── 侧边栏 ── */
+    /* ── 侧边栏（微信联系人列表风格） ── */
     #sidebar {
       width: var(--sidebar-w);
       min-width: var(--sidebar-w);
-      background: var(--bg2);
+      background: var(--sidebar-bg);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -189,73 +198,105 @@ function getHtmlPage() {
       z-index: 100;
     }
     #sidebar-header {
-      padding: 16px 12px 10px;
+      padding: 0 14px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--topbar-bg);
       border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
     }
     #sidebar-header h2 {
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 17px;
+      font-weight: 600;
       color: var(--text);
-      margin-bottom: 10px;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
     }
     #btn-new-session {
-      width: 100%;
-      padding: 8px 0;
-      background: var(--accent);
-      color: #fff;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      color: var(--text2);
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      padding: 4px;
     }
-    #btn-new-session:hover { opacity: 0.85; }
+    #btn-new-session:hover { background: var(--bg3); }
+    #btn-new-session svg { width: 20px; height: 20px; stroke: var(--text2); }
 
     #session-list {
       flex: 1;
       overflow-y: auto;
-      padding: 8px 6px;
+      padding: 0;
     }
     .session-item {
       display: flex;
       align-items: center;
-      padding: 8px 10px;
-      border-radius: 8px;
+      padding: 10px 14px;
       cursor: pointer;
-      gap: 8px;
-      transition: background 0.15s;
-      margin-bottom: 2px;
+      gap: 12px;
+      transition: background 0.1s;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      position: relative;
     }
+    [data-theme="dark"] .session-item { border-bottom-color: rgba(255,255,255,0.05); }
     .session-item:hover { background: var(--bg3); }
-    .session-item.active { background: var(--accent); color: #fff; }
-    .session-item.active .session-subtitle { color: rgba(255,255,255,0.7); }
-    .session-title {
+    .session-item.active { background: #d6d6d6; }
+    [data-theme="dark"] .session-item.active { background: #3a3a3a; }
+    .session-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      background: #5B9CF6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .session-avatar svg { width: 26px; height: 26px; }
+    .session-info {
       flex: 1;
-      font-size: 13px;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .session-title {
+      font-size: 15px;
       font-weight: 500;
+      color: var(--text);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      margin-bottom: 3px;
     }
     .session-subtitle {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text3);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .btn-del-session {
       background: none;
       border: none;
       cursor: pointer;
       color: var(--text3);
-      font-size: 16px;
-      padding: 0 2px;
+      padding: 4px;
       opacity: 0;
       transition: opacity 0.15s;
-      line-height: 1;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      flex-shrink: 0;
     }
+    .btn-del-session svg { width: 15px; height: 15px; stroke: currentColor; }
     .session-item:hover .btn-del-session { opacity: 1; }
-    .session-item.active .btn-del-session { opacity: 0.7; color: #fff; }
+    .session-item:hover .btn-del-session:hover { color: var(--danger); background: rgba(232,64,64,0.1); }
 
     /* ── 主区域 ── */
     #main {
@@ -263,29 +304,42 @@ function getHtmlPage() {
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      background: var(--chat-bg);
     }
 
-    /* ── 顶栏 ── */
+    /* ── 顶栏（微信风格导航栏） ── */
     #topbar {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      background: var(--bg);
+      gap: 8px;
+      padding: 0 12px;
+      height: 56px;
+      background: var(--topbar-bg);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
-      flex-wrap: wrap;
+    }
+    #topbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     #btn-sidebar-toggle {
       display: none;
       background: none;
       border: none;
-      font-size: 20px;
       cursor: pointer;
-      color: var(--text);
-      padding: 2px 6px;
+      color: var(--text2);
+      padding: 6px;
       border-radius: 6px;
+      align-items: center;
+      justify-content: center;
     }
+    #btn-sidebar-toggle svg { width: 22px; height: 22px; }
     #btn-sidebar-toggle:hover { background: var(--bg3); }
 
     select {
@@ -293,8 +347,8 @@ function getHtmlPage() {
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 7px;
-      padding: 5px 10px;
-      font-size: 13px;
+      padding: 4px 8px;
+      font-size: 12px;
       cursor: pointer;
       outline: none;
     }
@@ -308,17 +362,17 @@ function getHtmlPage() {
     #model-display {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: 7px;
-      padding: 5px 10px;
-      font-size: 13px;
+      padding: 4px 8px;
+      font-size: 12px;
       cursor: pointer;
       color: var(--text);
       user-select: none;
       white-space: nowrap;
-      min-width: 140px;
+      max-width: 130px;
     }
     #model-display:hover, #model-display:focus {
       border-color: var(--accent);
@@ -328,7 +382,7 @@ function getHtmlPage() {
     #model-dropdown {
       position: absolute;
       top: calc(100% + 4px);
-      left: 0;
+      right: 0;
       z-index: 1000;
       background: var(--bg2);
       border: 1px solid var(--border);
@@ -364,9 +418,10 @@ function getHtmlPage() {
     .model-option.selected { color: var(--accent); font-weight: 600; }
     .model-option.hidden { display: none; }
 
+    /* ── 状态指示 ── */
     #status-dot {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #aaa;
       flex-shrink: 0;
@@ -379,60 +434,135 @@ function getHtmlPage() {
       0%,100% { opacity: 1; } 50% { opacity: 0.4; }
     }
     #status-text {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text3);
       white-space: nowrap;
     }
 
     #btn-theme {
-      margin-left: auto;
       background: none;
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 7px;
-      padding: 5px 10px;
+      border: none;
+      color: var(--text2);
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
       cursor: pointer;
-      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      padding: 4px;
+      flex-shrink: 0;
     }
     #btn-theme:hover { background: var(--bg3); }
+    #btn-theme svg { width: 20px; height: 20px; }
 
-    /* ── 消息区 ── */
+    /* ── 消息区（微信聊天背景） ── */
     #messages {
       flex: 1;
       overflow-y: auto;
-      padding: 20px 16px;
+      padding: 12px 8px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 6px;
       scroll-behavior: smooth;
+      background: var(--chat-bg);
     }
 
+    /* ── 消息行（含头像+气泡） ── */
     .msg-row {
       display: flex;
-      flex-direction: column;
-      max-width: 820px;
-      width: 100%;
+      align-items: flex-start;
+      gap: 10px;
+      max-width: 100%;
+      padding: 2px 4px;
+      animation: msgSlideIn 0.2s ease-out;
     }
-    .msg-row.user { align-self: flex-end; align-items: flex-end; }
-    .msg-row.assistant { align-self: flex-start; align-items: flex-start; }
+    @keyframes msgSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .msg-row.user {
+      flex-direction: row-reverse;
+    }
+    .msg-row.assistant {
+      flex-direction: row;
+    }
 
+    /* ── 头像 ── */
+    .msg-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .msg-avatar.ai-avatar {
+      background: #5B9CF6;
+    }
+    .msg-avatar.user-avatar {
+      background: #8BC34A;
+    }
+    .msg-avatar svg { width: 26px; height: 26px; }
+
+    /* ── 气泡容器（含三角+气泡） ── */
+    .bubble-wrap {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      max-width: calc(100% - 100px);
+    }
+    .msg-row.user .bubble-wrap {
+      align-items: flex-end;
+    }
+    .bubble-with-arrow {
+      display: flex;
+      align-items: flex-start;
+    }
+    .msg-row.user .bubble-with-arrow {
+      flex-direction: row-reverse;
+    }
+
+    /* ── 三角箭头 ── */
+    .bubble-arrow {
+      width: 0;
+      height: 0;
+      flex-shrink: 0;
+      margin-top: 12px;
+    }
+    .msg-row.assistant .bubble-arrow {
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-right: 8px solid var(--assistant-bg);
+    }
+    .msg-row.user .bubble-arrow {
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 8px solid var(--user-bubble);
+    }
+
+    /* ── 气泡主体 ── */
     .bubble {
       padding: 10px 14px;
       border-radius: var(--radius);
-      font-size: 14.5px;
-      line-height: 1.65;
+      font-size: 15px;
+      line-height: 1.6;
       word-break: break-word;
       max-width: 100%;
+      position: relative;
+      min-width: 10px;
     }
     .msg-row.user .bubble {
       background: var(--user-bubble);
       color: var(--user-text);
-      border-bottom-right-radius: 4px;
+      border-top-right-radius: 2px;
     }
     .msg-row.assistant .bubble {
       background: var(--assistant-bg);
       color: var(--text);
-      border-bottom-left-radius: 4px;
+      border-top-left-radius: 2px;
     }
 
     /* ── Markdown 渲染样式 ── */
@@ -444,10 +574,13 @@ function getHtmlPage() {
       margin: 8px 0;
     }
     .bubble code:not(pre code) {
-      background: rgba(0,0,0,0.12);
+      background: rgba(0,0,0,0.10);
       border-radius: 4px;
       padding: 1px 5px;
       font-size: 0.88em;
+    }
+    .msg-row.user .bubble code:not(pre code) {
+      background: rgba(0,0,0,0.15);
     }
     [data-theme="dark"] .bubble code:not(pre code) {
       background: rgba(255,255,255,0.1);
@@ -474,7 +607,7 @@ function getHtmlPage() {
       display: inline-block;
       width: 2px;
       height: 1em;
-      background: var(--accent);
+      background: var(--text2);
       vertical-align: text-bottom;
       margin-left: 2px;
       animation: blink 1s step-end infinite;
@@ -483,19 +616,19 @@ function getHtmlPage() {
 
     /* ── 思考/工具折叠块 ── */
     .collapsible {
-      margin: 6px 0;
+      margin: 4px 0;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid var(--tool-border);
       width: 100%;
-      max-width: 820px;
+      font-size: 13px;
     }
     .collapsible.thinking { border-color: var(--thinking-border); }
     .collapsible-header {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding: 7px 12px;
+      gap: 6px;
+      padding: 7px 10px;
       background: var(--tool-bg);
       cursor: pointer;
       font-size: 12px;
@@ -503,46 +636,63 @@ function getHtmlPage() {
       color: var(--text2);
       user-select: none;
     }
-    .collapsible.thinking .collapsible-header { background: var(--thinking-bg); color: #8a7a20; }
-    [data-theme="dark"] .collapsible.thinking .collapsible-header { color: #c9a820; }
-    .collapsible-arrow {
-      font-size: 10px;
-      transition: transform 0.2s;
+    .collapsible.thinking .collapsible-header {
+      background: var(--thinking-bg);
+      color: #7a5c10;
     }
+    [data-theme="dark"] .collapsible.thinking .collapsible-header { color: #c9a820; }
+    .collapsible-header-icon { width: 14px; height: 14px; flex-shrink: 0; }
+    .collapsible-arrow {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      color: var(--text3);
+    }
+    .collapsible-arrow svg { width: 12px; height: 12px; }
     .collapsible.open .collapsible-arrow { transform: rotate(90deg); }
     .collapsible-body {
       display: none;
-      padding: 10px 12px;
+      padding: 8px 10px;
       background: var(--tool-bg);
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--text2);
       white-space: pre-wrap;
       word-break: break-word;
       max-height: 400px;
       overflow-y: auto;
     }
-    .collapsible.thinking .collapsible-body { background: var(--thinking-bg); }
+    .collapsible.thinking .collapsible-body {
+      background: var(--thinking-bg);
+      font-style: italic;
+      color: #5a4010;
+    }
+    [data-theme="dark"] .collapsible.thinking .collapsible-body { color: #c9a820; }
     .collapsible.open .collapsible-body { display: block; }
 
-    /* ── 输入区 ── */
+    /* ── 输入区（微信风格） ── */
     #input-area {
       border-top: 1px solid var(--border);
-      padding: 12px 16px;
-      padding-bottom: calc(12px + env(safe-area-inset-bottom));
-      background: var(--bg);
+      padding: 10px 12px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      background: var(--topbar-bg);
       display: flex;
       align-items: flex-end;
-      gap: 10px;
+      gap: 8px;
     }
     #input-wrap {
       flex: 1;
       display: flex;
       align-items: flex-end;
-      background: var(--bg2);
+      background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 4px 10px;
+      border-radius: 6px;
+      padding: 6px 10px;
       transition: border-color 0.2s;
+    }
+    [data-theme="dark"] #input-wrap {
+      background: var(--bg2);
     }
     #input-wrap:focus-within { border-color: var(--accent); }
     #input {
@@ -551,19 +701,19 @@ function getHtmlPage() {
       border: none;
       outline: none;
       color: var(--text);
-      font-size: 14.5px;
+      font-size: 15px;
       line-height: 1.5;
       resize: none;
       max-height: 200px;
       overflow-y: auto;
-      padding: 6px 0;
+      padding: 0;
       font-family: inherit;
     }
     #input::placeholder { color: var(--text3); }
     #btn-send {
       background: var(--accent);
       border: none;
-      border-radius: 10px;
+      border-radius: 50%;
       width: 40px;
       height: 40px;
       display: flex;
@@ -571,10 +721,11 @@ function getHtmlPage() {
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: opacity 0.15s;
+      transition: background 0.15s, transform 0.1s;
     }
-    #btn-send:hover { opacity: 0.85; }
-    #btn-send svg { width: 18px; height: 18px; fill: #fff; }
+    #btn-send:hover { background: var(--accent-hover); }
+    #btn-send:active { transform: scale(0.93); }
+    #btn-send svg { width: 20px; height: 20px; fill: #fff; }
     #btn-send.cancel { background: var(--danger); }
 
     /* ── 空状态 ── */
@@ -584,10 +735,14 @@ function getHtmlPage() {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 14px;
       color: var(--text3);
     }
-    #empty-state .logo { font-size: 48px; }
+    #empty-state .logo {
+      width: 72px;
+      height: 72px;
+      opacity: 0.5;
+    }
     #empty-state p { font-size: 15px; }
 
     /* ── 手机端适配 ── */
@@ -598,7 +753,7 @@ function getHtmlPage() {
         transform: translateX(-100%);
       }
       #sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
-      #btn-sidebar-toggle { display: block; }
+      #btn-sidebar-toggle { display: flex; }
       #overlay {
         display: none;
         position: fixed;
@@ -607,13 +762,14 @@ function getHtmlPage() {
         z-index: 99;
       }
       #overlay.show { display: block; }
-      .msg-row { max-width: 100%; }
+      .bubble-wrap { max-width: calc(100% - 60px); }
     }
 
     /* ── 滚动条 ── */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
 
     /* ── 密码保护界面 ── */
     #auth-screen {
@@ -640,9 +796,13 @@ function getHtmlPage() {
       box-shadow: 0 8px 40px rgba(0,0,0,0.3);
     }
     #auth-logo {
-      font-size: 52px;
-      line-height: 1;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    #auth-logo svg { width: 64px; height: 64px; }
     #auth-title {
       font-size: 20px;
       font-weight: 700;
@@ -690,13 +850,13 @@ function getHtmlPage() {
 
     /* ── 侧边栏底部 ── */
     #sidebar-footer {
-      padding: 10px 8px;
+      padding: 10px 12px;
       border-top: 1px solid var(--border);
       flex-shrink: 0;
     }
     #btn-clear-sessions {
       width: 100%;
-      padding: 7px 0;
+      padding: 8px 0;
       background: none;
       border: 1px solid var(--border);
       color: var(--text3);
@@ -704,10 +864,13 @@ function getHtmlPage() {
       font-size: 12px;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #btn-clear-sessions:hover {
-      background: var(--danger);
-      color: #fff;
+      background: rgba(232,64,64,0.1);
+      color: var(--danger);
       border-color: var(--danger);
     }
 
@@ -783,20 +946,19 @@ function getHtmlPage() {
     }
     .att-remove:hover { opacity: 0.8; }
 
-    /* ── 📎 按钮 ── */
+    /* ── 附件按钮 ── */
     #btn-attach {
       background: none;
       border: none;
       cursor: pointer;
       color: var(--text3);
-      font-size: 20px;
-      padding: 4px 6px;
-      border-radius: 7px;
-      line-height: 1;
+      padding: 8px;
+      border-radius: 50%;
       flex-shrink: 0;
       transition: color 0.15s, background 0.15s;
       display: flex;
       align-items: center;
+      justify-content: center;
     }
     #btn-attach:hover { color: var(--accent); background: var(--bg3); }
 
@@ -821,7 +983,7 @@ function getHtmlPage() {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(29, 114, 232, 0.18);
+      background: rgba(7, 193, 96, 0.12);
       border: 3px dashed var(--accent);
       z-index: 9999;
       pointer-events: none;
@@ -853,7 +1015,7 @@ function getHtmlPage() {
       gap: 6px;
       margin-top: 6px;
       font-size: 12px;
-      background: rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.08);
       border-radius: 6px;
       padding: 5px 8px;
     }
@@ -864,7 +1026,13 @@ function getHtmlPage() {
 <!-- 密码验证界面 -->
 <div id="auth-screen">
   <div id="auth-card">
-    <div id="auth-logo">🐾</div>
+    <div id="auth-logo">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#07C160" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="24" cy="24" r="20"/>
+        <path d="M16 20 C16 14 32 14 32 20 C32 26 24 26 24 30"/>
+        <circle cx="24" cy="36" r="1.5" fill="#07C160"/>
+      </svg>
+    </div>
     <div id="auth-title">OpenClaw WebUI</div>
     <div id="auth-subtitle">请输入访问密码</div>
     <input type="password" id="auth-input" placeholder="密码" autocomplete="current-password" />
@@ -878,7 +1046,9 @@ function getHtmlPage() {
 
 <!-- 拖拽上传遮罩 -->
 <div id="drag-overlay">
-  <div>📎</div>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px">
+    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+  </svg>
   <div>松开鼠标以上传文件</div>
 </div>
 
@@ -888,20 +1058,34 @@ function getHtmlPage() {
 <!-- ── 侧边栏 ── -->
 <aside id="sidebar">
   <div id="sidebar-header">
-    <h2>🐾 OpenClaw</h2>
-    <button id="btn-new-session">＋ 新建会话</button>
+    <h2>OpenClaw</h2>
+    <button id="btn-new-session" title="新建会话">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    </button>
   </div>
   <div id="session-list"></div>
   <div id="sidebar-footer">
-    <button id="btn-clear-sessions">🗑 清空所有会话</button>
+    <button id="btn-clear-sessions">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:4px">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+      </svg>
+      清空所有会话
+    </button>
   </div>
 </aside>
 
 <!-- ── 主区域 ── -->
 <div id="main">
-  <!-- 顶栏 -->
+  <!-- 顶栏（微信风格） -->
   <div id="topbar">
-    <button id="btn-sidebar-toggle">☰</button>
+    <button id="btn-sidebar-toggle" title="菜单">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <span id="topbar-title">选择或新建会话</span>
     <select id="sel-gateway" title="选择 Gateway"></select>
     <div id="model-picker" title="切换模型">
       <div id="model-display" tabindex="0">
@@ -915,7 +1099,17 @@ function getHtmlPage() {
     </div>
     <span id="status-dot" title="连接状态"></span>
     <span id="status-text">未连接</span>
-    <button id="btn-theme" title="切换主题">☀️</button>
+    <button id="btn-theme" title="切换主题">
+      <svg id="icon-theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <svg id="icon-theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
   </div>
 
   <!-- 断连横幅 -->
@@ -924,7 +1118,17 @@ function getHtmlPage() {
   <!-- 消息区 -->
   <div id="messages">
     <div id="empty-state">
-      <div class="logo">🐾</div>
+      <div class="logo">
+        <svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="14" y="20" width="44" height="36" rx="6"/>
+          <circle cx="26" cy="38" r="4"/>
+          <circle cx="46" cy="38" r="4"/>
+          <path d="M28 50 C28 54 44 54 44 50"/>
+          <path d="M24 20 L24 14 M48 20 L48 14"/>
+          <rect x="20" y="10" width="8" height="8" rx="2"/>
+          <rect x="44" y="10" width="8" height="8" rx="2"/>
+        </svg>
+      </div>
       <p>选择或新建一个会话，开始对话</p>
     </div>
   </div>
@@ -932,14 +1136,20 @@ function getHtmlPage() {
   <!-- 附件预览条 -->
   <div id="attachment-preview"></div>
 
-  <!-- 输入区 -->
+  <!-- 输入区（微信风格） -->
   <div id="input-area">
+    <button id="btn-attach" title="添加附件">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px">
+        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+      </svg>
+    </button>
     <div id="input-wrap">
-      <button id="btn-attach" title="添加附件">📎</button>
-      <textarea id="input" rows="1" placeholder="输入消息... (Enter 发送，Shift+Enter 换行)"></textarea>
+      <textarea id="input" rows="1" placeholder="输入消息..."></textarea>
     </div>
     <button id="btn-send" title="发送">
-      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
     </button>
   </div>
 </div>
@@ -1111,7 +1321,9 @@ function renderAttachmentPreview() {
     } else {
       const icon = document.createElement('div');
       icon.className = 'att-icon';
-      icon.textContent = file.type === 'application/pdf' ? '📄' : '📝';
+      icon.innerHTML = file.type === 'application/pdf'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
       item.appendChild(icon);
     }
 
@@ -1123,7 +1335,7 @@ function renderAttachmentPreview() {
 
     const rmBtn = document.createElement('button');
     rmBtn.className = 'att-remove';
-    rmBtn.textContent = '✕';
+    rmBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     rmBtn.title = '移除';
     rmBtn.addEventListener('click', () => removeAttachment(idx));
     item.appendChild(rmBtn);
@@ -1234,7 +1446,13 @@ document.addEventListener('drop', (e) => {
 function setTheme(t) {
   state.theme = t;
   document.body.dataset.theme = t;
-  dom.btnTheme.textContent = t === 'dark' ? '☀️' : '🌙';
+  // Update theme icon
+  const sunIcon = document.getElementById('icon-theme-sun');
+  const moonIcon = document.getElementById('icon-theme-moon');
+  if (sunIcon && moonIcon) {
+    sunIcon.style.display = t === 'dark' ? 'block' : 'none';
+    moonIcon.style.display = t === 'dark' ? 'none' : 'block';
+  }
   const hl = document.getElementById('hljs-theme');
   hl.href = t === 'dark'
     ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'
@@ -1415,7 +1633,7 @@ function wsSend(obj, msgEl) {
         const lbl = document.createElement('span');
         lbl.className = 'pending-label';
         lbl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px;display:block;text-align:right';
-        lbl.textContent = '⏳ 发送中...';
+        lbl.textContent = '发送中...';
         msgEl.appendChild(lbl);
       }
     }
@@ -1490,9 +1708,9 @@ function handleServerMsg(msg) {
         finalizeLastMsg(sess);
 
         if (msg.phase === 'error') {
-          addSysMsg(sess, '❌ 错误: ' + (msg.message || '未知错误'));
+          addSysMsg(sess, '错误: ' + (msg.message || '未知错误'));
         } else if (msg.phase === 'cancelled') {
-          addSysMsg(sess, '⚠️ 已取消');
+          addSysMsg(sess, '已取消');
         }
       }
       break;
@@ -1813,6 +2031,9 @@ function createSession() {
   state.sessions.push(sess);
   renderSessList();
   switchSession(id);
+  // 新建会话时更新顶部标题
+  const titleEl = document.getElementById('topbar-title');
+  if (titleEl) titleEl.textContent = '新会话';
   persistSessions();
   return sess;
 }
@@ -1838,6 +2059,9 @@ function switchSession(id) {
   dom.selGateway.value = sess.gatewayIdx;
   renderMessages(sess);
   closeSidebar();
+  // 更新顶部标题
+  const titleEl = document.getElementById('topbar-title');
+  if (titleEl) titleEl.textContent = sess.title || '新会话';
   try { localStorage.setItem(OC_CURRENT_KEY, id); } catch(e) {}
 }
 
@@ -1863,6 +2087,11 @@ function updateSessTitle(sess) {
       : (first.attachments && first.attachments.length > 0 ? '[图片/文件]' : '新会话');
     sess.title = titleText;
     renderSessList();
+    // 更新顶部标题
+    if (isCurrent(sess)) {
+      const titleEl = document.getElementById('topbar-title');
+      if (titleEl) titleEl.textContent = titleText;
+    }
     persistSessions();
   }
 }
@@ -1873,26 +2102,40 @@ function renderSessList() {
     const item = document.createElement('div');
     item.className = 'session-item' + (sess.id === state.currentSessionId ? ' active' : '');
 
+    // 头像
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'session-avatar';
+    avatarEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="13" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9.5 17 C9.5 19 14.5 19 14.5 17"/><path d="M7 6V4M17 6V4"/><rect x="5.5" y="1.5" width="3" height="3" rx="1"/><rect x="15.5" y="1.5" width="3" height="3" rx="1"/></svg>';
+
+    // 信息区
     const info = document.createElement('div');
-    info.style.cssText = 'flex:1;overflow:hidden';
+    info.className = 'session-info';
     const titleEl = document.createElement('div');
     titleEl.className = 'session-title';
     titleEl.textContent = sess.title;
     const subEl = document.createElement('div');
     subEl.className = 'session-subtitle';
-    subEl.textContent = (state.gateways[sess.gatewayIdx] || {}).name || ('Gateway ' + sess.gatewayIdx);
+    // 显示最后一条消息预览
+    const lastMsg = [...sess.messages].reverse().find(m => m.role === 'user' || m.role === 'assistant');
+    if (lastMsg) {
+      const preview = (lastMsg.content || '').replace(/[\r\n]+/g, ' ').trim();
+      subEl.textContent = preview ? preview.slice(0, 30) + (preview.length > 30 ? '…' : '') : '[无内容]';
+    } else {
+      subEl.textContent = (state.gateways[sess.gatewayIdx] || {}).name || ('Gateway ' + sess.gatewayIdx);
+    }
     info.appendChild(titleEl);
     info.appendChild(subEl);
 
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-del-session';
     delBtn.title = '删除';
-    delBtn.textContent = '×';
+    delBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
       if (confirm('删除此会话？')) deleteSession(sess.id);
     });
 
+    item.appendChild(avatarEl);
     item.appendChild(info);
     item.appendChild(delBtn);
     item.addEventListener('click', () => switchSession(sess.id));
@@ -1918,6 +2161,23 @@ function renderMessages(sess) {
 function makeUserBubble(text, attachments) {
   const row = document.createElement('div');
   row.className = 'msg-row user';
+
+  // 用户头像（右侧）
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar user-avatar';
+  avatar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20 C4 15 8 13 12 13 C16 13 20 15 20 20"/></svg>';
+
+  // 气泡包装
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap';
+
+  const withArrow = document.createElement('div');
+  withArrow.className = 'bubble-with-arrow';
+
+  // 三角箭头
+  const arrow = document.createElement('div');
+  arrow.className = 'bubble-arrow';
+
   const bub = document.createElement('div');
   bub.className = 'bubble';
 
@@ -1938,17 +2198,19 @@ function makeUserBubble(text, attachments) {
         img.alt = att.filename;
         bub.appendChild(img);
       } else {
-        // 非图片：显示文件名
         const fileDiv = document.createElement('div');
         fileDiv.className = 'bubble-file';
-        const icon = att.mimeType === 'application/pdf' ? '📄' : '📝';
-        fileDiv.textContent = icon + ' ' + att.filename;
+        fileDiv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> ' + escapeHtml(att.filename);
         bub.appendChild(fileDiv);
       }
     });
   }
 
-  row.appendChild(bub);
+  withArrow.appendChild(arrow);
+  withArrow.appendChild(bub);
+  wrap.appendChild(withArrow);
+  row.appendChild(wrap);
+  row.appendChild(avatar);
   return row;
 }
 
@@ -1957,10 +2219,27 @@ function makeAssistantRow(msgObj) {
   row.className = 'msg-row assistant';
   row.dataset.msgId = msgObj.id;
 
+  // AI头像（左侧）
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar ai-avatar';
+  avatar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="13" rx="2"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><path d="M9.5 17 C9.5 18.5 14.5 18.5 14.5 17"/><path d="M7 6V4M17 6V4"/><rect x="5.5" y="1.5" width="3" height="3" rx="1"/><rect x="15.5" y="1.5" width="3" height="3" rx="1"/></svg>';
+
+  // 气泡包装（含折叠块+气泡）
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap';
+  wrap.dataset.wrapId = msgObj.id;
+
   if (msgObj.thinking) {
-    row.appendChild(makeThinkBlock(msgObj.thinking, /*open=*/false));
+    wrap.appendChild(makeThinkBlock(msgObj.thinking, /*open=*/false));
   }
-  msgObj.tools.forEach(t => row.appendChild(makeToolBlock(t)));
+  msgObj.tools.forEach(t => wrap.appendChild(makeToolBlock(t)));
+
+  const withArrow = document.createElement('div');
+  withArrow.className = 'bubble-with-arrow';
+
+  // 三角箭头
+  const arrow = document.createElement('div');
+  arrow.className = 'bubble-arrow';
 
   const bub = document.createElement('div');
   bub.className = 'bubble';
@@ -1968,18 +2247,22 @@ function makeAssistantRow(msgObj) {
   if (!msgObj.done) {
     bub.appendChild(makeCursor());
   }
-  row.appendChild(bub);
+
+  withArrow.appendChild(arrow);
+  withArrow.appendChild(bub);
+  wrap.appendChild(withArrow);
+  row.appendChild(avatar);
+  row.appendChild(wrap);
   return row;
 }
 
 function makeSysBubble(text) {
   const row = document.createElement('div');
-  row.className = 'msg-row assistant';
-  const bub = document.createElement('div');
-  bub.className = 'bubble';
-  bub.style.cssText = 'font-size:12px;opacity:0.7;font-style:italic';
-  bub.textContent = text;
-  row.appendChild(bub);
+  row.style.cssText = 'display:flex;justify-content:center;padding:4px 0;';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-size:12px;color:var(--text3);background:rgba(0,0,0,0.06);padding:3px 10px;border-radius:10px;font-style:italic;max-width:80%;text-align:center;';
+  lbl.textContent = text;
+  row.appendChild(lbl);
   return row;
 }
 
@@ -1994,13 +2277,18 @@ function makeThinkBlock(text, open) {
   el.className = 'collapsible thinking' + (open ? ' open' : '');
   const hdr = document.createElement('div');
   hdr.className = 'collapsible-header';
+  // 灯泡图标
+  const icon = document.createElement('span');
+  icon.className = 'collapsible-header-icon';
+  icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M9 18h6M10 21h4M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.5-3 6H8C6.5 13.5 5 11.5 5 9a7 7 0 0 1 7-7z"/></svg>';
+  const lbl = document.createElement('span');
+  lbl.textContent = '思考过程';
   const arr = document.createElement('span');
   arr.className = 'collapsible-arrow';
-  arr.textContent = '▶';
-  const lbl = document.createElement('span');
-  lbl.textContent = '💭 思考过程';
-  hdr.appendChild(arr);
+  arr.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  hdr.appendChild(icon);
   hdr.appendChild(lbl);
+  hdr.appendChild(arr);
   hdr.addEventListener('click', () => el.classList.toggle('open'));
   const body = document.createElement('div');
   body.className = 'collapsible-body';
@@ -2010,38 +2298,74 @@ function makeThinkBlock(text, open) {
   return el;
 }
 
+// 根据工具名返回对应 SVG 图标
+function getToolIcon(name) {
+  const n = (name || '').toLowerCase();
+  if (n === 'exec' || n.includes('exec') || n.includes('shell') || n.includes('run')) {
+    // 终端图标
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>';
+  }
+  if (n === 'web_search' || n.includes('search') || n.includes('browse') || n.includes('web')) {
+    // 搜索图标
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+  }
+  if (n === 'read' || n === 'write' || n.includes('file') || n.includes('read') || n.includes('write')) {
+    // 文件图标
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+  }
+  if (n.includes('browser') || n.includes('click') || n.includes('navigate')) {
+    // 浏览器图标
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  }
+  if (n.includes('image') || n.includes('photo') || n.includes('vision')) {
+    // 图片图标
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+  }
+  // 默认工具图标（扳手）
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
+}
+
 function makeToolBlock(tool) {
   const el = document.createElement('div');
   el.className = 'collapsible';
   el.dataset.toolId = tool.id;
   const hdr = document.createElement('div');
   hdr.className = 'collapsible-header';
+
+  // 工具图标
+  const icon = document.createElement('span');
+  icon.className = 'collapsible-header-icon';
+  icon.innerHTML = getToolIcon(tool.name);
+
+  const lbl = document.createElement('span');
+  lbl.textContent = tool.name;
+
   const arr = document.createElement('span');
   arr.className = 'collapsible-arrow';
-  arr.textContent = '▶';
-  const lbl = document.createElement('span');
-  lbl.textContent = '🔧 ' + tool.name;
-  hdr.appendChild(arr);
+  arr.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+  hdr.appendChild(icon);
   hdr.appendChild(lbl);
+  hdr.appendChild(arr);
   hdr.addEventListener('click', () => el.classList.toggle('open'));
 
   const body = document.createElement('div');
   body.className = 'collapsible-body';
 
   const argsLabel = document.createElement('div');
-  argsLabel.style.cssText = 'margin-bottom:6px;font-weight:600';
-  argsLabel.textContent = '参数:';
+  argsLabel.style.cssText = 'margin-bottom:5px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3)';
+  argsLabel.textContent = '参数';
   const argsPre = document.createElement('pre');
-  argsPre.style.cssText = 'margin:0;font-size:12px;white-space:pre-wrap;word-break:break-all';
-  argsPre.textContent = tool.args ? JSON.stringify(tool.args, null, 2) : '';
+  argsPre.style.cssText = 'margin:0 0 8px;font-size:11px;white-space:pre-wrap;word-break:break-all;background:var(--bg3);padding:6px 8px;border-radius:4px';
+  argsPre.textContent = tool.args ? JSON.stringify(tool.args, null, 2) : '(无)';
 
   const resLabel = document.createElement('div');
-  resLabel.style.cssText = 'margin:8px 0 4px;font-weight:600';
-  resLabel.textContent = '结果:';
+  resLabel.style.cssText = 'margin-bottom:5px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3)';
+  resLabel.textContent = '结果';
   const resPre = document.createElement('pre');
   resPre.className = 'tool-result';
-  resPre.style.cssText = 'margin:0;font-size:12px;white-space:pre-wrap;word-break:break-all';
-  resPre.textContent = tool.result !== null ? JSON.stringify(tool.result, null, 2) : '⏳ 等待结果...';
+  resPre.style.cssText = 'margin:0;font-size:11px;white-space:pre-wrap;word-break:break-all;background:var(--bg3);padding:6px 8px;border-radius:4px';
+  resPre.textContent = tool.result !== null ? JSON.stringify(tool.result, null, 2) : '等待结果...';
 
   body.appendChild(argsLabel);
   body.appendChild(argsPre);
@@ -2075,10 +2399,12 @@ function updateBubbleStream(msgObj) {
 function updateThinkingBlock(msgObj) {
   const row = dom.messages.querySelector('[data-msg-id="' + msgObj.id + '"]');
   if (!row) return;
-  let thinkEl = row.querySelector('.collapsible.thinking');
+  const wrap = row.querySelector('.bubble-wrap');
+  const container = wrap || row;
+  let thinkEl = container.querySelector('.collapsible.thinking');
   if (!thinkEl) {
     thinkEl = makeThinkBlock(msgObj.thinking, false);
-    row.insertBefore(thinkEl, row.firstChild);
+    container.insertBefore(thinkEl, container.firstChild);
   } else {
     thinkEl.querySelector('.collapsible-body').textContent = msgObj.thinking;
   }
@@ -2087,8 +2413,10 @@ function updateThinkingBlock(msgObj) {
 function addToolBlock(msgObj, tool) {
   const row = dom.messages.querySelector('[data-msg-id="' + msgObj.id + '"]');
   if (!row) return;
-  const bub = row.querySelector('.bubble');
-  row.insertBefore(makeToolBlock(tool), bub);
+  const wrap = row.querySelector('.bubble-wrap');
+  const container = wrap || row;
+  const withArrow = container.querySelector('.bubble-with-arrow');
+  container.insertBefore(makeToolBlock(tool), withArrow || container.querySelector('.bubble'));
   scrollToBottom();
 }
 
