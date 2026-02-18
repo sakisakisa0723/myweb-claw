@@ -127,81 +127,54 @@ function getHtmlPage() {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"><\/script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"><\/script>
   <style>
-    /* ── CSS 变量（微信风格主题） ── */
+    /* ── CSS 变量（主题） ── */
     :root {
-      /* 微信风格亮色配色 */
-      --bg: #EDEDED;
-      --bg2: #F7F7F7;
-      --bg3: #E5E5E5;
-      --chat-bg: #FFFFFF;
-      --border: #D6D6D6;
-      --border-light: #E8E8E8;
-      --text: #000000;
+      --bg: #ffffff;
+      --bg2: #f5f5f5;
+      --bg3: #ebebeb;
+      --border: #d9d9d9;
+      --text: #1a1a1a;
       --text2: #555555;
       --text3: #888888;
-      /* 微信绿色系 */
-      --wechat-green: #07C160;
-      --wechat-green-light: #95EC69;
-      --wechat-green-dark: #06AD56;
-      --user-bubble: #95EC69;
-      --user-text: #000000;
-      --ai-bubble: #FFFFFF;
-      --ai-text: #000000;
-      /* 工具/思考卡片 */
-      --tool-bg: #F5F5F5;
-      --tool-border: #E0E0E0;
-      --thinking-bg: #FAFAFA;
-      --thinking-border: #E8E8E8;
-      --accent: #07C160;
-      --danger: #FA5151;
-      --sidebar-w: 280px;
-      --radius: 4px;
-      --bubble-radius: 6px;
-      --header-height: 50px;
-      --input-height: 56px;
+      --user-bubble: #1d72e8;
+      --user-text: #ffffff;
+      --assistant-bg: #f0f4ff;
+      --tool-bg: #f7f7f7;
+      --tool-border: #d0d0d0;
+      --thinking-bg: #fdfaf0;
+      --thinking-border: #e8d87a;
+      --accent: #1d72e8;
+      --danger: #e84040;
+      --sidebar-w: 260px;
+      --radius: 12px;
     }
     [data-theme="dark"] {
-      /* 暗色模式 - 深灰风格 */
-      --bg: #111111;
-      --bg2: #1A1A1A;
-      --bg3: #2A2A2A;
-      --chat-bg: #1A1A1A;
-      --border: #2F2F2F;
-      --border-light: #3A3A3A;
-      --text: #E0E0E0;
-      --text2: #AAAAAA;
+      --bg: #1a1a1a;
+      --bg2: #242424;
+      --bg3: #2e2e2e;
+      --border: #3a3a3a;
+      --text: #e8e8e8;
+      --text2: #aaaaaa;
       --text3: #666666;
-      /* 暗色下的绿色调整 */
-      --wechat-green: #07C160;
-      --wechat-green-light: #0A9C4F;
-      --wechat-green-dark: #06AD56;
-      --user-bubble: #0A9C4F;
-      --user-text: #FFFFFF;
-      --ai-bubble: #2A2A2A;
-      --ai-text: #E0E0E0;
+      --user-bubble: #2b5fd4;
+      --user-text: #ffffff;
+      --assistant-bg: #1e2330;
       --tool-bg: #252525;
-      --tool-border: #3A3A3A;
-      --thinking-bg: #1F1F1F;
-      --thinking-border: #3A3A3A;
-      --accent: #07C160;
+      --tool-border: #3a3a3a;
+      --thinking-bg: #23200f;
+      --thinking-border: #6b5c10;
+      --accent: #4d8bff;
     }
-
-    /* ── SVG 图标定义 ── */
-    .icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-    .icon-sm { width: 18px; height: 18px; }
-    .icon-xs { width: 14px; height: 14px; }
-    .icon-filled { fill: currentColor; stroke: none; }
 
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       display: flex;
       transition: background 0.2s, color 0.2s;
-      -webkit-font-smoothing: antialiased;
     }
 
     /* ── 侧边栏 ── */
@@ -436,16 +409,7 @@ function getHtmlPage() {
 
     .msg-row {
       display: flex;
-      margin-bottom: 16px;
-      animation: msgSlideIn 0.25s ease-out;
-      max-width: 100%;
-    }
-    @keyframes msgSlideIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .msg-row.user { justify-content: flex-end; }
-    .msg-row.assistant { justify-content: flex-start; }
+      flex-direction: column;
       max-width: 820px;
       width: 100%;
     }
@@ -463,37 +427,13 @@ function getHtmlPage() {
     .msg-row.user .bubble {
       background: var(--user-bubble);
       color: var(--user-text);
-      border-top-right-radius: 2px;
-    }
-    .msg-row.user .bubble::after {
-      content: '';
-      position: absolute;
-      right: -5px;
-      top: 10px;
-      width: 0;
-      height: 0;
-      border-top: 6px solid transparent;
-      border-bottom: 6px solid transparent;
-      border-left: 6px solid var(--user-bubble);
+      border-bottom-right-radius: 4px;
     }
     .msg-row.assistant .bubble {
-      background: var(--ai-bubble);
-      color: var(--ai-text);
-      border: 1px solid var(--border-light);
-      border-top-left-radius: 2px;
+      background: var(--assistant-bg);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
     }
-    .msg-row.assistant .bubble::after {
-      content: '';
-      position: absolute;
-      left: -5px;
-      top: 10px;
-      width: 0;
-      height: 0;
-      border-top: 6px solid transparent;
-      border-bottom: 6px solid transparent;
-      border-right: 6px solid var(--ai-bubble);
-    }
-    [data-theme="dark"] .msg-row.assistant .bubble { border-color: var(--border); }
 
     /* ── Markdown 渲染样式 ── */
     .bubble pre {
@@ -540,7 +480,6 @@ function getHtmlPage() {
       animation: blink 1s step-end infinite;
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     /* ── 思考/工具折叠块 ── */
     .collapsible {
@@ -622,9 +561,9 @@ function getHtmlPage() {
     }
     #input::placeholder { color: var(--text3); }
     #btn-send {
-      background: var(--wechat-green);
+      background: var(--accent);
       border: none;
-      border-radius: 4px;
+      border-radius: 10px;
       width: 40px;
       height: 40px;
       display: flex;
@@ -925,9 +864,7 @@ function getHtmlPage() {
 <!-- 密码验证界面 -->
 <div id="auth-screen">
   <div id="auth-card">
-    <div id="auth-logo">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-    </div>
+    <div id="auth-logo">🐾</div>
     <div id="auth-title">OpenClaw WebUI</div>
     <div id="auth-subtitle">请输入访问密码</div>
     <input type="password" id="auth-input" placeholder="密码" autocomplete="current-password" />
@@ -941,7 +878,7 @@ function getHtmlPage() {
 
 <!-- 拖拽上传遮罩 -->
 <div id="drag-overlay">
-  <svg class="icon" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+  <div>📎</div>
   <div>松开鼠标以上传文件</div>
 </div>
 
@@ -951,17 +888,12 @@ function getHtmlPage() {
 <!-- ── 侧边栏 ── -->
 <aside id="sidebar">
   <div id="sidebar-header">
-    <h2>OpenClaw</h2>
-    <button id="btn-new-session" title="新建会话">
-      <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
+    <h2>🐾 OpenClaw</h2>
+    <button id="btn-new-session">＋ 新建会话</button>
   </div>
   <div id="session-list"></div>
   <div id="sidebar-footer">
-    <button id="btn-clear-sessions">
-      <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      清空所有会话
-    </button>
+    <button id="btn-clear-sessions">🗑 清空所有会话</button>
   </div>
 </aside>
 
@@ -969,17 +901,8 @@ function getHtmlPage() {
 <div id="main">
   <!-- 顶栏 -->
   <div id="topbar">
-    <div id="topbar-left">
-      <button id="btn-sidebar-toggle" title="菜单">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <button id="btn-back" title="返回" style="display:none">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      </button>
-    </div>
-    <div id="topbar-center">OpenClaw</div>
-    <div id="topbar-right">
-      <select id="sel-gateway" title="选择 Gateway"></select>
+    <button id="btn-sidebar-toggle">☰</button>
+    <select id="sel-gateway" title="选择 Gateway"></select>
     <div id="model-picker" title="切换模型">
       <div id="model-display" tabindex="0">
         <span id="model-label">加载中…</span>
@@ -992,9 +915,7 @@ function getHtmlPage() {
     </div>
     <span id="status-dot" title="连接状态"></span>
     <span id="status-text">未连接</span>
-    <button id="btn-theme" title="切换主题">
-        <svg class="icon icon-sm" viewBox="0 0 24 24" id="theme-icon-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </button>
+    <button id="btn-theme" title="切换主题">☀️</button>
   </div>
 
   <!-- 断连横幅 -->
@@ -1003,9 +924,7 @@ function getHtmlPage() {
   <!-- 消息区 -->
   <div id="messages">
     <div id="empty-state">
-      <div class="logo">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      </div>
+      <div class="logo">🐾</div>
       <p>选择或新建一个会话，开始对话</p>
     </div>
   </div>
@@ -1016,14 +935,12 @@ function getHtmlPage() {
   <!-- 输入区 -->
   <div id="input-area">
     <div id="input-wrap">
-      <button id="btn-attach" title="添加附件">
-        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-      </button>
+      <button id="btn-attach" title="添加附件">📎</button>
       <textarea id="input" rows="1" placeholder="输入消息... (Enter 发送，Shift+Enter 换行)"></textarea>
     </div>
     <button id="btn-send" title="发送">
-        <svg class="icon" viewBox="0 0 24 24" style="stroke:#fff;fill:none"><line x1="22" y1="12" x2="2" y2="12"/><polyline points="12 2 2 12 12 22"/></svg>
-      </button>
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
   </div>
 </div>
 
@@ -1194,9 +1111,7 @@ function renderAttachmentPreview() {
     } else {
       const icon = document.createElement('div');
       icon.className = 'att-icon';
-      icon.innerHTML = file.type === 'application/pdf' 
-        ? '<svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'
-        : '<svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
+      icon.textContent = file.type === 'application/pdf' ? '📄' : '📝';
       item.appendChild(icon);
     }
 
@@ -1208,7 +1123,7 @@ function renderAttachmentPreview() {
 
     const rmBtn = document.createElement('button');
     rmBtn.className = 'att-remove';
-    rmBtn.innerHTML = '<svg class="icon icon-xs" viewBox="0 0 24 24" style="stroke:#fff;stroke-width:3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    rmBtn.textContent = '✕';
     rmBtn.title = '移除';
     rmBtn.addEventListener('click', () => removeAttachment(idx));
     item.appendChild(rmBtn);
@@ -1319,10 +1234,7 @@ document.addEventListener('drop', (e) => {
 function setTheme(t) {
   state.theme = t;
   document.body.dataset.theme = t;
-  // 更新主题图标
-  const sunIcon = '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
-  const moonIcon = '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  dom.btnTheme.innerHTML = t === 'dark' ? sunIcon : moonIcon;
+  dom.btnTheme.textContent = t === 'dark' ? '☀️' : '🌙';
   const hl = document.getElementById('hljs-theme');
   hl.href = t === 'dark'
     ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'
@@ -1503,7 +1415,7 @@ function wsSend(obj, msgEl) {
         const lbl = document.createElement('span');
         lbl.className = 'pending-label';
         lbl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px;display:block;text-align:right';
-        lbl.innerHTML = '<svg class="icon icon-xs" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="60" stroke-dashoffset="20"/></svg> 发送中...';
+        lbl.textContent = '⏳ 发送中...';
         msgEl.appendChild(lbl);
       }
     }
@@ -1578,9 +1490,9 @@ function handleServerMsg(msg) {
         finalizeLastMsg(sess);
 
         if (msg.phase === 'error') {
-          addSysMsg(sess, '错误: ' + (msg.message || '未知错误'));
+          addSysMsg(sess, '❌ 错误: ' + (msg.message || '未知错误'));
         } else if (msg.phase === 'cancelled') {
-          addSysMsg(sess, '已取消');
+          addSysMsg(sess, '⚠️ 已取消');
         }
       }
       break;
@@ -1925,9 +1837,6 @@ function switchSession(id) {
   if (!sess) return;
   dom.selGateway.value = sess.gatewayIdx;
   renderMessages(sess);
-  // 更新顶栏标题
-  const topbarCenter = document.getElementById('topbar-center');
-  if (topbarCenter) topbarCenter.textContent = sess.title;
   closeSidebar();
   try { localStorage.setItem(OC_CURRENT_KEY, id); } catch(e) {}
 }
@@ -1964,46 +1873,21 @@ function renderSessList() {
     const item = document.createElement('div');
     item.className = 'session-item' + (sess.id === state.currentSessionId ? ' active' : '');
 
-    // 头像
-    const avatar = document.createElement('div');
-    avatar.className = 'session-avatar';
-    avatar.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>';
-    
     const info = document.createElement('div');
-    info.className = 'session-info';
-    
-    const titleRow = document.createElement('div');
-    titleRow.className = 'session-title-row';
+    info.style.cssText = 'flex:1;overflow:hidden';
     const titleEl = document.createElement('div');
     titleEl.className = 'session-title';
     titleEl.textContent = sess.title;
-    const timeEl = document.createElement('div');
-    timeEl.className = 'session-time';
-    timeEl.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    titleRow.appendChild(titleEl);
-    titleRow.appendChild(timeEl);
-    
-    // 最后消息预览
-    const previewEl = document.createElement('div');
-    previewEl.className = 'session-preview';
-    const lastMsg = sess.messages[sess.messages.length - 1];
-    if (lastMsg) {
-      if (lastMsg.role === 'user') {
-        previewEl.textContent = lastMsg.content ? lastMsg.content.slice(0, 30) : (lastMsg.attachments ? '[图片/文件]' : '');
-      } else if (lastMsg.role === 'assistant') {
-        previewEl.textContent = lastMsg.content ? lastMsg.content.slice(0, 30) : '...';
-      }
-    } else {
-      previewEl.textContent = (state.gateways[sess.gatewayIdx] || {}).name || 'Gateway ' + sess.gatewayIdx;
-    }
-    
-    info.appendChild(titleRow);
-    info.appendChild(previewEl);
+    const subEl = document.createElement('div');
+    subEl.className = 'session-subtitle';
+    subEl.textContent = (state.gateways[sess.gatewayIdx] || {}).name || ('Gateway ' + sess.gatewayIdx);
+    info.appendChild(titleEl);
+    info.appendChild(subEl);
 
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-del-session';
     delBtn.title = '删除';
-    delBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+    delBtn.textContent = '×';
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
       if (confirm('删除此会话？')) deleteSession(sess.id);
@@ -2034,15 +1918,6 @@ function renderMessages(sess) {
 function makeUserBubble(text, attachments) {
   const row = document.createElement('div');
   row.className = 'msg-row user';
-  
-  // 头像
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  avatar.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-  
-  const content = document.createElement('div');
-  content.className = 'msg-content';
-  
   const bub = document.createElement('div');
   bub.className = 'bubble';
 
@@ -2066,15 +1941,14 @@ function makeUserBubble(text, attachments) {
         // 非图片：显示文件名
         const fileDiv = document.createElement('div');
         fileDiv.className = 'bubble-file';
-        fileDiv.innerHTML = '<svg class="icon icon-xs" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + escapeHtml(att.filename);
+        const icon = att.mimeType === 'application/pdf' ? '📄' : '📝';
+        fileDiv.textContent = icon + ' ' + att.filename;
         bub.appendChild(fileDiv);
       }
     });
   }
-  
-  content.appendChild(bub);
-  row.appendChild(content);
-  row.appendChild(avatar);
+
+  row.appendChild(bub);
   return row;
 }
 
@@ -2082,20 +1956,11 @@ function makeAssistantRow(msgObj) {
   const row = document.createElement('div');
   row.className = 'msg-row assistant';
   row.dataset.msgId = msgObj.id;
-  
-  // 头像
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  avatar.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>';
-  row.appendChild(avatar);
-  
-  const content = document.createElement('div');
-  content.className = 'msg-content';
 
   if (msgObj.thinking) {
-    content.appendChild(makeThinkBlock(msgObj.thinking, /*open=*/false));
+    row.appendChild(makeThinkBlock(msgObj.thinking, /*open=*/false));
   }
-  msgObj.tools.forEach(t => content.appendChild(makeToolBlock(t)));
+  msgObj.tools.forEach(t => row.appendChild(makeToolBlock(t)));
 
   const bub = document.createElement('div');
   bub.className = 'bubble';
@@ -2103,8 +1968,7 @@ function makeAssistantRow(msgObj) {
   if (!msgObj.done) {
     bub.appendChild(makeCursor());
   }
-  content.appendChild(bub);
-  row.appendChild(content);
+  row.appendChild(bub);
   return row;
 }
 
@@ -2132,13 +1996,10 @@ function makeThinkBlock(text, open) {
   hdr.className = 'collapsible-header';
   const arr = document.createElement('span');
   arr.className = 'collapsible-arrow';
-  arr.innerHTML = '<svg class="icon icon-xs" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
-  const icon = document.createElement('span');
-  icon.innerHTML = '<svg class="icon icon-xs" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"/></svg>';
+  arr.textContent = '▶';
   const lbl = document.createElement('span');
-  lbl.textContent = '思考过程';
+  lbl.textContent = '💭 思考过程';
   hdr.appendChild(arr);
-  hdr.appendChild(icon);
   hdr.appendChild(lbl);
   hdr.addEventListener('click', () => el.classList.toggle('open'));
   const body = document.createElement('div');
@@ -2149,24 +2010,6 @@ function makeThinkBlock(text, open) {
   return el;
 }
 
-function getToolIcon(name) {
-  // 根据工具类型返回不同的SVG图标
-  if (name === 'exec' || name.includes('terminal') || name.includes('shell')) {
-    return '<svg class="icon icon-xs" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>';
-  }
-  if (name === 'web_search' || name.includes('search')) {
-    return '<svg class="icon icon-xs" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
-  }
-  if (name === 'read' || name === 'write' || name.includes('file')) {
-    return '<svg class="icon icon-xs" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
-  }
-  if (name === 'browser' || name.includes('web')) {
-    return '<svg class="icon icon-xs" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-  }
-  // 默认工具图标
-  return '<svg class="icon icon-xs" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
-}
-
 function makeToolBlock(tool) {
   const el = document.createElement('div');
   el.className = 'collapsible';
@@ -2175,14 +2018,10 @@ function makeToolBlock(tool) {
   hdr.className = 'collapsible-header';
   const arr = document.createElement('span');
   arr.className = 'collapsible-arrow';
-  arr.innerHTML = '<svg class="icon icon-xs" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
-  const icon = document.createElement('span');
-  icon.className = 'tool-icon';
-  icon.innerHTML = getToolIcon(tool.name);
+  arr.textContent = '▶';
   const lbl = document.createElement('span');
-  lbl.textContent = tool.name;
+  lbl.textContent = '🔧 ' + tool.name;
   hdr.appendChild(arr);
-  hdr.appendChild(icon);
   hdr.appendChild(lbl);
   hdr.addEventListener('click', () => el.classList.toggle('open'));
 
@@ -2285,11 +2124,11 @@ function updateSendBtn() {
   if (state.isStreaming) {
     dom.btnSend.classList.add('cancel');
     dom.btnSend.title = '取消';
-    dom.btnSend.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="stroke:#fff;fill:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    dom.btnSend.innerHTML = '<svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" fill="white"/></svg>';
   } else {
     dom.btnSend.classList.remove('cancel');
     dom.btnSend.title = '发送';
-    dom.btnSend.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="stroke:#fff;fill:none"><line x1="22" y1="12" x2="2" y2="12"/><polyline points="12 2 2 12 12 22"/></svg>';
+    dom.btnSend.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
   }
 }
 
