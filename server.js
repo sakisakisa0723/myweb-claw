@@ -800,6 +800,22 @@ function getHtmlPage() {
     }
     #btn-attach:hover { color: var(--accent); background: var(--bg3); }
 
+    /* ── 断连横幅 ── */
+    #disconnect-banner {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: #e84040;
+      color: #fff;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 16px;
+      letter-spacing: 0.2px;
+    }
+    #disconnect-banner.show { display: block; }
+
     /* ── 拖拽遮罩 ── */
     #drag-overlay {
       display: none;
@@ -902,6 +918,9 @@ function getHtmlPage() {
     <button id="btn-theme" title="切换主题">☀️</button>
   </div>
 
+  <!-- 断连横幅 -->
+  <div id="disconnect-banner">连接已断开，正在重连...</div>
+
   <!-- 消息区 -->
   <div id="messages">
     <div id="empty-state">
@@ -980,6 +999,7 @@ const dom = {
   authBtn:           byId('auth-btn'),
   authError:         byId('auth-error'),
   btnClearSessions:  byId('btn-clear-sessions'),
+  disconnectBanner:  byId('disconnect-banner'),
 };
 
 /* ─── 工具函数 ─────────────────────────────────────── */
@@ -1277,6 +1297,49 @@ function flushPendingMessages() {
   });
 }
 
+/* ─── Bug 2 修复：禁用/恢复输入框和发送按钮 ──────── */
+function setInputDisabled(disabled) {
+  dom.input.disabled = disabled;
+  dom.btnSend.disabled = disabled;
+  dom.input.style.opacity = disabled ? '0.45' : '';
+  dom.btnSend.style.opacity = disabled ? '0.45' : '';
+  dom.input.style.cursor = disabled ? 'not-allowed' : '';
+  dom.btnSend.style.cursor = disabled ? 'not-allowed' : '';
+}
+
+/**
+ * Bug 2 修复：断连时，对所有正在流式输出（未 done）的 assistant 消息，
+ * 在消息下方追加灰色提示"回复可能已中断，请重新发送"。
+ */
+function markInterruptedStreams() {
+  // 找出当前 session 中所有未完成的 assistant 消息
+  const sess = state.sessions.find(s => s.id === state.currentSessionId);
+  if (!sess) return;
+  sess.messages.forEach(m => {
+    if (m.role === 'assistant' && !m.done) {
+      // 标记为已完成（避免重复提示）
+      m.done = true;
+      // 更新气泡（去除光标）
+      const row = dom.messages.querySelector('[data-msg-id="' + m.id + '"]');
+      if (row) {
+        const bub = row.querySelector('.bubble');
+        if (bub) {
+          bub.innerHTML = renderMarkdown(m.content);
+          // 追加灰色提示
+          const hint = document.createElement('div');
+          hint.style.cssText = 'margin-top:8px;font-size:12px;color:#999;font-style:italic;';
+          hint.textContent = '回复可能已中断，请重新发送';
+          bub.appendChild(hint);
+        }
+      }
+    }
+  });
+  // 重置流式状态
+  state.isStreaming = false;
+  state.currentRunId = null;
+  updateSendBtn();
+}
+
 /* ─── WebSocket 连接（前端 → 后端） ──────────────── */
 let wsReconnectTimer = null;
 
@@ -1299,6 +1362,10 @@ function connectWS() {
     setStatus('connected', '已连接');
     // pending 消息在 auth_ok（有密码）或收到 init（无密码）后冲刷
     // 对于无密码的情况，等收到 init 消息后再标记 authenticated 并冲刷
+
+    // Bug 2 修复：重连成功，隐藏断连横幅，恢复输入功能（等 init/auth_ok 后再恢复）
+    setInputDisabled(false);
+    dom.disconnectBanner.classList.remove('show');
   });
 
   ws.addEventListener('close', () => {
@@ -1307,6 +1374,14 @@ function connectWS() {
     state.authenticated = false; // 断线后重置认证状态
     const pending = state.pendingMessages.length;
     setStatus('error', pending > 0 ? '连接断开，重连中...' : '连接断开，重连中...');
+
+    // Bug 2 修复：断连时禁用输入框和发送按钮，显示断连横幅
+    setInputDisabled(true);
+    dom.disconnectBanner.classList.add('show');
+
+    // Bug 2 修复：如果有正在进行的 AI 回复（lifecycle start 但未 end），显示中断提示
+    markInterruptedStreams();
+
     wsReconnectTimer = setTimeout(connectWS, 3000);
   });
 
@@ -2514,11 +2589,20 @@ class GatewayClient {
 const frontendClients = new Set();
 
 function broadcastToFrontend(msg) {
-  const json = JSON.stringify(msg);
   for (const client of frontendClients) {
-    if (client.readyState === WebSocket.OPEN && client._authenticated) {
-      try { client.send(json); } catch(e) { /* ignore */ }
+    if (client.readyState !== WebSocket.OPEN || !client._authenticated) continue;
+
+    // Bug 1 修复：对于 agent/chat 事件，检查 sessionKey 是否属于该前端连接
+    // 需要过滤的消息类型：lifecycle, chunk, thinking, tool_start, tool_result
+    const SESSION_SCOPED_TYPES = new Set(['lifecycle', 'chunk', 'thinking', 'tool_start', 'tool_result']);
+    if (SESSION_SCOPED_TYPES.has(msg.type) && msg.sessionKey) {
+      if (!client._ownedSessions.has(msg.sessionKey)) {
+        // 不属于该前端连接的 session，silently 丢弃
+        continue;
+      }
     }
+
+    try { client.send(JSON.stringify(msg)); } catch(e) { /* ignore */ }
   }
 }
 
@@ -2545,6 +2629,9 @@ wss.on('connection', (ws, req) => {
 
   // 认证状态：无密码时直接标记为已认证
   ws._authenticated = !AUTH_REQUIRED;
+
+  // Bug 1 修复：每个前端连接维护一个 ownedSessions Set，用于过滤事件
+  ws._ownedSessions = new Set();
 
   if (AUTH_REQUIRED) {
     // 告诉前端需要密码
@@ -2635,6 +2722,9 @@ function handleFrontendMsg(ws, msg) {
         return;
       }
       const sessionKey = msg.sessionKey || ('webui:default_' + gwIdx);
+
+      // Bug 1 修复：前端创建/使用 session 时，把 sessionKey 加入该连接的 ownedSessions Set
+      ws._ownedSessions.add(sessionKey);
       const attachments = Array.isArray(msg.attachments) ? msg.attachments : [];
 
       // 服务端校验附件
