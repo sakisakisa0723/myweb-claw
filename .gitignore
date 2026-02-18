@@ -1,0 +1,6 @@
+node_modules/
+device.json
+config.json
+config.local.json
+*.log
+server.js.bak

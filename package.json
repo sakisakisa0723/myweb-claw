@@ -1,0 +1,16 @@
+{
+  "name": "openclaw-webui",
+  "version": "1.0.0",
+  "description": "OpenClaw WebUI - A streaming chat interface for OpenClaw Gateway",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["openclaw", "webui", "chat", "ai"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
