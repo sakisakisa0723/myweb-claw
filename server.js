@@ -320,8 +320,9 @@ function getHtmlPage() {
     }
     #topbar-title {
       flex: 1;
+      min-width: 0;
       text-align: center;
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--text);
       overflow: hidden;
@@ -372,7 +373,9 @@ function getHtmlPage() {
       color: var(--text);
       user-select: none;
       white-space: nowrap;
-      max-width: 130px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     #model-display:hover, #model-display:focus {
       border-color: var(--accent);
@@ -419,6 +422,15 @@ function getHtmlPage() {
     .model-option.hidden { display: none; }
 
     /* ── 状态指示 ── */
+    #sel-gateway {
+      display: none;
+    }
+    #topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
     #status-dot {
       width: 8px;
       height: 8px;
@@ -1085,19 +1097,19 @@ function getHtmlPage() {
     </button>
     <span id="topbar-title">选择或新建会话</span>
     <select id="sel-gateway" title="选择 Gateway"></select>
-    <div id="model-picker" title="切换模型">
-      <div id="model-display" tabindex="0">
-        <span id="model-label">加载中…</span>
-        <span class="model-arrow">▾</span>
+    <div id="topbar-right">
+      <div id="model-picker" title="切换模型">
+        <div id="model-display" tabindex="0">
+          <span id="model-label">加载中…</span>
+          <span class="model-arrow">▾</span>
+        </div>
+        <div id="model-dropdown" class="model-dropdown-hidden">
+          <input id="model-search" type="text" placeholder="搜索模型…" autocomplete="off" />
+          <div id="model-options"></div>
+        </div>
       </div>
-      <div id="model-dropdown" class="model-dropdown-hidden">
-        <input id="model-search" type="text" placeholder="搜索模型…" autocomplete="off" />
-        <div id="model-options"></div>
-      </div>
-    </div>
-    <span id="status-dot" title="连接状态"></span>
-    <span id="status-text">未连接</span>
-    <button id="btn-theme" title="切换主题">
+      <span id="status-dot" title="连接状态"></span>
+      <button id="btn-theme" title="切换主题">
       <svg id="icon-theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
         <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
@@ -1108,6 +1120,7 @@ function getHtmlPage() {
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
     </button>
+    </div>
   </div>
 
   <!-- 断连横幅 -->
