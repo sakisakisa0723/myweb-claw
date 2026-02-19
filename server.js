@@ -493,11 +493,9 @@ function getHtmlPage() {
       to   { opacity: 1; transform: translateY(0); }
     }
     .msg-row.user {
-      flex-direction: row-reverse;
       justify-content: flex-end;
     }
     .msg-row.assistant {
-      flex-direction: row;
       justify-content: flex-start;
     }
 
