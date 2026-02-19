@@ -482,9 +482,9 @@ function getHtmlPage() {
     /* ── 消息行（含头像+气泡） ── */
     .msg-row {
       display: flex;
+      width: 100%;
       align-items: flex-start;
       gap: 10px;
-      max-width: 100%;
       padding: 2px 4px;
       animation: msgSlideIn 0.2s ease-out;
     }
@@ -494,35 +494,24 @@ function getHtmlPage() {
     }
     .msg-row.user {
       flex-direction: row-reverse;
+      justify-content: flex-end;
     }
     .msg-row.assistant {
       flex-direction: row;
+      justify-content: flex-start;
     }
 
-    /* ── 头像 ── */
+    /* ── 头像（已隐藏） ── */
     .msg-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: none;
     }
-    .msg-avatar.ai-avatar {
-      background: #5B9CF6;
-    }
-    .msg-avatar.user-avatar {
-      background: #8BC34A;
-    }
-    .msg-avatar svg { width: 26px; height: 26px; }
 
     /* ── 气泡容器（含三角+气泡） ── */
     .bubble-wrap {
       display: flex;
       align-items: flex-start;
       flex-direction: column;
-      max-width: calc(100% - 100px);
+      max-width: 75%;
     }
     .msg-row.user .bubble-wrap {
       align-items: flex-end;
@@ -535,22 +524,9 @@ function getHtmlPage() {
       flex-direction: row-reverse;
     }
 
-    /* ── 三角箭头 ── */
+    /* ── 三角箭头（已隐藏，去掉头像后三角不再需要） ── */
     .bubble-arrow {
-      width: 0;
-      height: 0;
-      flex-shrink: 0;
-      margin-top: 12px;
-    }
-    .msg-row.assistant .bubble-arrow {
-      border-top: 6px solid transparent;
-      border-bottom: 6px solid transparent;
-      border-right: 8px solid var(--assistant-bg);
-    }
-    .msg-row.user .bubble-arrow {
-      border-top: 6px solid transparent;
-      border-bottom: 6px solid transparent;
-      border-left: 8px solid var(--user-bubble);
+      display: none;
     }
 
     /* ── 气泡主体 ── */
@@ -772,7 +748,7 @@ function getHtmlPage() {
         z-index: 99;
       }
       #overlay.show { display: block; }
-      .bubble-wrap { max-width: calc(100% - 60px); }
+      .bubble-wrap { max-width: 85%; }
     }
 
     /* ── 滚动条 ── */
