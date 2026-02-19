@@ -1576,6 +1576,7 @@ function connectWS() {
   state.ws = ws;
 
   ws.addEventListener('open', () => {
+    console.log('[WS] open event fired');
     state.wsConnected = true;
     setStatus('connected', '已连接');
     // pending 消息在 auth_ok（有密码）或收到 init（无密码）后冲刷
@@ -1586,7 +1587,8 @@ function connectWS() {
     dom.disconnectBanner.classList.remove('show');
   });
 
-  ws.addEventListener('close', () => {
+  ws.addEventListener('close', (evt) => {
+    console.log('[WS] close event, code=' + evt.code + ' reason=' + evt.reason);
     state.wsConnected = false;
     state.ws = null;
     state.authenticated = false; // 断线后重置认证状态
@@ -1609,8 +1611,13 @@ function connectWS() {
 
   ws.addEventListener('message', evt => {
     let msg;
-    try { msg = JSON.parse(evt.data); } catch(e) { return; }
-    handleServerMsg(msg);
+    try { msg = JSON.parse(evt.data); } catch(e) { console.error('[WS] parse error', e); return; }
+    console.log('[WS] recv:', msg.type);
+    try {
+      handleServerMsg(msg);
+    } catch(err) {
+      console.error('[WS] handleServerMsg error:', err);
+    }
   });
 }
 
@@ -2118,7 +2125,7 @@ function renderSessList() {
     // 显示最后一条消息预览
     const lastMsg = [...sess.messages].reverse().find(m => m.role === 'user' || m.role === 'assistant');
     if (lastMsg) {
-      const preview = (lastMsg.content || '').replace(/[\r\n]+/g, ' ').trim();
+      const preview = (lastMsg.content || '').split(String.fromCharCode(10)).join(' ').split(String.fromCharCode(13)).join(' ').trim();
       subEl.textContent = preview ? preview.slice(0, 30) + (preview.length > 30 ? '…' : '') : '[无内容]';
     } else {
       subEl.textContent = (state.gateways[sess.gatewayIdx] || {}).name || ('Gateway ' + sess.gatewayIdx);
@@ -2955,6 +2962,15 @@ wss.on('connection', (ws, req) => {
   const ip = req.socket.remoteAddress;
   console.log('[Frontend] New connection from', ip);
 
+  ws.on('error', (err) => {
+    console.error('[Frontend] WS error from', ip, err.message);
+  });
+
+  ws.on('close', (code, reason) => {
+    console.log('[Frontend] Disconnected', ip, 'code=' + code, 'reason=' + (reason || ''));
+    frontendClients.delete(ws);
+  });
+
   // 认证状态：无密码时直接标记为已认证
   ws._authenticated = !AUTH_REQUIRED;
 
@@ -3002,15 +3018,7 @@ wss.on('connection', (ws, req) => {
     handleFrontendMsg(ws, msg);
   });
 
-  ws.on('close', () => {
-    console.log('[Frontend] Disconnected', ip);
-    frontendClients.delete(ws);
-  });
-
-  ws.on('error', (err) => {
-    console.error('[Frontend] Error:', err.message);
-    frontendClients.delete(ws);
-  });
+  // (close and error handlers already registered above)
 });
 
 /** 向指定前端发送初始化数据 */
