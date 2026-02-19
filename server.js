@@ -427,16 +427,14 @@ function getHtmlPage() {
       flex-shrink: 0;
       transition: background 0.3s;
     }
-    #status-dot.connected { background: #27c45a; }
-    #status-dot.connecting { background: #f5a623; animation: pulse 1s infinite; }
-    #status-dot.error { background: var(--danger); }
+    #status-dot.connected { background: #07C160; }
+    #status-dot.connecting { background: #f0ad4e; animation: pulse 1s infinite; }
+    #status-dot.error { background: #e84040; }
     @keyframes pulse {
       0%,100% { opacity: 1; } 50% { opacity: 0.4; }
     }
     #status-text {
-      font-size: 11px;
-      color: var(--text3);
-      white-space: nowrap;
+      display: none;
     }
 
     #btn-theme {
@@ -1482,7 +1480,8 @@ dom.overlay.addEventListener('click', closeSidebar);
 function setStatus(cls, text) {
   dom.statusDot.className = cls; // 'connected' | 'connecting' | 'error' | ''
   const pending = state.pendingMessages.length;
-  dom.statusText.textContent = pending > 0 ? text + ' · ' + pending + ' 条消息待发送' : text;
+  const tooltip = pending > 0 ? text + ' · ' + pending + ' 条消息待发送' : text;
+  dom.statusDot.title = tooltip;
 }
 
 function refreshStatus() {
